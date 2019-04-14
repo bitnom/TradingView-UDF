@@ -116,23 +116,28 @@ switch ($action) {
         }
         break;
     case 'history':
-        $exchangeName = 'Binance';
         $requestAr = requestCheck(['symbol', 'from', 'to', 'resolution']);
         $symbol = $requestAr['symbol'];
+        $resolution = $requestAr['resolution'];
+        if($resolution == 'D' || $resolution == 'W' || $resolution == 'M'){
+            $resolution = '1'.strtolower($resolution);
+        }
 
         $exchangeStr = '\\ccxt\\'.strtolower($exchangeName);
-        $exchange = new $exchangeStr (array ('enableRateLimit' => true));
-        // load all markets from the exchange
-        $markets = $exchange->load_markets ();
-
-        $ohlcvs = $exchange->fetchOHLCV ($symbol, $requestAr['resolution'], $requestAr['from']);
+        $exchange = new $exchangeStr ([
+            'enableRateLimit' => true,
+            //'verbose' => true,
+                ]);
+        $markets = $exchange->load_markets();
+        $ohlcv = $exchange->fetchOHLCV($symbol, $resolution, $requestAr['from'], 360);
+        $ohlcvTv = $exchange->convert_ohlcv_to_trading_view($ohlcv);
         $tAr = [];
         $oAr = [];
         $hAr = [];
         $lAr = [];
         $cAr = [];
         $vAr = [];
-        foreach ($ohlcvs as $candle) {
+        foreach ($ohlcvTv as $candle) {
             $tAr[] = $candle[0];
             $oAr[] = $candle[1];
             $hAr[] = $candle[2];
