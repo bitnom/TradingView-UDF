@@ -1,0 +1,9 @@
+## Begin TradingView UDF.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /api
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^api/(.*)$ /api/index.php?action=$1 [QSA,L]
+</IfModule>
+# End TradingView UDF
