@@ -1,7 +1,7 @@
 # TradingView-UDF
 **What**
 
-This is a [TradingView charting](https://github.com/tradingview/charting_library) library UDF implemented in PHP.
+This is a [TradingView charting library](https://github.com/tradingview/charting_library) UDF implemented in PHP.
 
 **Why**
 
