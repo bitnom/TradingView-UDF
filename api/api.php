@@ -35,9 +35,14 @@ switch ($action) {
         $responseAr['supports_timescale_marks'] = false;
         break;
     case 'symbols':
-        $exchangeName = 'Binance';
         $requestAr = requestCheck(['symbol']);
         $symbol = $requestAr['symbol'];
+        if(strpos($requestAr['symbol'], ':') !== false){
+            $symbol = explode(':', $requestAr['symbol']);
+            $exchangeName = $symbol[0];
+            $symbol = $symbol[1];
+        }
+
 
         $exchangeStr = '\\ccxt\\'.strtolower($exchangeName);
         $exchange = new $exchangeStr  ([
@@ -46,9 +51,9 @@ switch ($action) {
         ]);
         try {
             $result = $exchange->fetch_ticker ($symbol);
-            $responseAr['name'] = $result['info']['symbol'];
+            $responseAr['name'] = $result['symbol'];
             $responseAr['ticker'] = $result['symbol'];
-            $responseAr['description'] = $result['info']['symbol'];
+            $responseAr['description'] = $result['symbol'];
             $responseAr['type'] = 'crypto';
             $responseAr['session'] = '24x7';
             $responseAr['exchange'] = $exchangeName;
@@ -73,11 +78,7 @@ switch ($action) {
             $responseAr['expired'] = false;
             //$responseAr['expiration_date'] = '';
             $responseAr['industry'] = 'crypto';
-            $responseAr['currency_code'] = $result['info']['symbol'];
-
-            //$responseAr['test'] = $result['change'];
-            //$responseAr['result'] = $result;
-            //$responseAr['symbol'] = $result;
+            $responseAr['currency_code'] = $result['symbol'];
         } catch (\ccxt\NetworkError $e) {
             echo '[Network Error] ' . $e->getMessage () . "\n";
         } catch (\ccxt\ExchangeError $e) {
@@ -85,7 +86,6 @@ switch ($action) {
         } catch (Exception $e) {
             echo '[Error] ' . $e->getMessage () . "\n";
         }
-
         break;
     case 'symbol_info':
         //
@@ -126,32 +126,18 @@ switch ($action) {
         $exchangeStr = '\\ccxt\\'.strtolower($exchangeName);
         $exchange = new $exchangeStr ([
             'enableRateLimit' => true,
-            //'verbose' => true,
                 ]);
         $markets = $exchange->load_markets();
         $ohlcv = $exchange->fetchOHLCV($symbol, $resolution, $requestAr['from'], 360);
         $ohlcvTv = $exchange->convert_ohlcv_to_trading_view($ohlcv);
-        $tAr = [];
-        $oAr = [];
-        $hAr = [];
-        $lAr = [];
-        $cAr = [];
-        $vAr = [];
-        foreach ($ohlcvTv as $candle) {
-            $tAr[] = $candle[0];
-            $oAr[] = $candle[1];
-            $hAr[] = $candle[2];
-            $lAr[] = $candle[3];
-            $cAr[] = $candle[4];
-            $vAr[] = $candle[5];
-        }
+        $responseAr[] = $ohlcvTv;
+        $responseAr['t'] = $ohlcvTv['t'];
+        $responseAr['o'] = $ohlcvTv['o'];
+        $responseAr['h'] = $ohlcvTv['h'];
+        $responseAr['l'] = $ohlcvTv['l'];
+        $responseAr['c'] = $ohlcvTv['c'];
+        $responseAr['v'] = $ohlcvTv['v'];
         $responseAr['s'] = 'ok';
-        $responseAr['t'] = $tAr;
-        $responseAr['o'] = $oAr;
-        $responseAr['h'] = $hAr;
-        $responseAr['l'] = $lAr;
-        $responseAr['c'] = $cAr;
-        $responseAr['v'] = $vAr;
         break;
     case 'marks':
         //
