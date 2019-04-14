@@ -13,7 +13,7 @@ You may use freely but I chose the GPL3 license which means if you modify this c
 
 **How-To**
 
-As I most often create APIs for use alongside Wordpress, I have left the Wordpress initializer in the code but commented out. This UDF assumes that you're installing it under an `/api/` subdirectory on an Apache, Litespeed, or OpenLitespeed server. It will work on NGINX as well but you'll have to create your own rewrites in that case.
+This UDF assumes that you're installing it under an `/api/` subdirectory on an Apache, Litespeed, or OpenLitespeed server. It will work on NGINX as well but you'll have to create your own rewrites in that case.
 
 This UDF currently aims to act as a proxy between crypto exchanges and the TradingView charting library. This is accomplished using the [CCXT library](https://github.com/ccxt/ccxt).
 
