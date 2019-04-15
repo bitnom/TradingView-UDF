@@ -43,7 +43,6 @@ switch ($action) {
             $symbol = $symbol[1];
         }
 
-
         $exchangeStr = '\\ccxt\\'.strtolower($exchangeName);
         $exchange = new $exchangeStr  ([
             'verbose' => false,
@@ -63,7 +62,7 @@ switch ($action) {
             $responseAr['pricescale'] = "";
             $responseAr['minmove2'] = "";
             $responseAr['fractional'] = "";
-            $responseAr['has_intraday'] = false;
+            $responseAr['has_intraday'] = true;
             $responseAr['supported_resolutions'] = ['1', '5', '15', '30', '60', '1D', '1W', '1M'];
             $responseAr['intraday_multipliers'] = [];
             $responseAr['has_seconds'] = false;
@@ -92,7 +91,6 @@ switch ($action) {
         break;
     case 'search':
         $requestAr = requestCheck(['query', 'type', 'exchange', 'limit']);
-        $exchangeName = 'Binance';
         $symbol = $requestAr['symbol'];
 
         $exchangeStr = '\\ccxt\\'.strtolower($exchangeName);
@@ -122,13 +120,23 @@ switch ($action) {
         if($resolution == 'D' || $resolution == 'W' || $resolution == 'M'){
             $resolution = '1'.strtolower($resolution);
         }
-
+        $limit = ($requestAr['to'] - $requestAr['from']) / 60 / $resolution;
+        if($resolution == '1d'){
+            $limit = ($requestAr['to'] - $requestAr['from']) / 60 / 60 / 24;
+        }
+        if($resolution == '1w'){
+            $limit = ($requestAr['to'] - $requestAr['from']) / 60 / 60 / 24 / 7;
+        }
+        if($resolution == '1m'){
+            $limit = ($requestAr['to'] - $requestAr['from']) / 60 / 60 / 24 / 7 / 4;
+        }
         $exchangeStr = '\\ccxt\\'.strtolower($exchangeName);
         $exchange = new $exchangeStr ([
             'enableRateLimit' => true,
+            //'verbose' => true,
                 ]);
         $markets = $exchange->load_markets();
-        $ohlcv = $exchange->fetchOHLCV($symbol, $resolution, $requestAr['from'], 360);
+        $ohlcv = $exchange->fetchOHLCV($symbol, $resolution, $requestAr['from'], 10);
         $ohlcvTv = $exchange->convert_ohlcv_to_trading_view($ohlcv);
         $responseAr[] = $ohlcvTv;
         $responseAr['t'] = $ohlcvTv['t'];
@@ -151,19 +159,17 @@ switch ($action) {
     case 'quotes':
         $requestAr = requestCheck(['symbols']);
         $symbols = explode(',', $requestAr['symbols']);
-
-        $exchangeName = 'Binance';
         $symbol = $requestAr['symbol'];
 
         $exchangeStr = '\\ccxt\\'.strtolower($exchangeName);
         $exchange = new $exchangeStr  ([
-            'verbose' => false,
+            'verbose' => true,
             'timeout' => 30000,
         ]);
         $symbolAr = [];
         foreach($symbols as $key => $symbol){
             try {
-                $result = $exchange->fetch_ticker ($symbol);
+                $result = $exchange->fetch_ticker($symbol);
                 $symbolAr[$key]['s'] = 'ok';
                 $symbolAr[$key]['n'] = "$exchangeName:".$result['info']['symbol'];
                 if(strpos((string)$result['change'], '-') === false){
