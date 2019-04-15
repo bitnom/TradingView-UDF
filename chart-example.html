@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PHP TradingView UDF Example</title>
+    <script type="text/javascript" src="/chart/charting_library/charting_library.min.js"></script>
+    <script type="text/javascript" src="/chart/datafeeds/udf/dist/polyfills.js"></script>
+    <script type="text/javascript" src="/chart/datafeeds/udf/dist/bundle.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+    function initOnReady() {
+        var widget = window.tvWidget = new TradingView.widget({
+            // debug: true, // uncomment this line to see Library errors and warnings in the console
+// https://tensortom.com/api/?action=chartGetMarket
+            fullscreen: true,
+            symbol: 'BTC/USD',
+            interval: '1d',
+            container_id: "tv_chart_container",
+            debug: true,
+
+            //	BEWARE: no trailing slash is expected in feed URL / https://demo_feed.tradingview.com
+            datafeed: new Datafeeds.UDFCompatibleDatafeed("https://example.com/api"),
+            library_path: "/chart/charting_library/",
+            locale: getParameterByName('lang') || "en",
+
+            disabled_features: ["use_localstorage_for_settings"],
+            enabled_features: ["study_templates"],
+            charts_storage_url: 'https://saveload.tradingview.com',
+            charts_storage_api_version: "1.1",
+            client_id: 'tradingview.com',
+            user_id: 'public_user_id',
+            theme: getParameterByName('theme'),
+        });
+    };
+
+    window.addEventListener('DOMContentLoaded', initOnReady, false);
+</script>
+<div id="tv_chart_container"></div>
+
+</body>
+</html>
