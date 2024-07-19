@@ -1,4 +1,9 @@
 # TradingView-UDF
+
+## Notice
+
+This library is no longer maintained since I haven't had time to keep up with it or interest in TradingView UDF any longer.
+
 **What**
 
 This is a [TradingView charting library](https://github.com/tradingview/charting_library) UDF implemented in PHP.
